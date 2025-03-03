@@ -1,5 +1,8 @@
-variable "instance_name" {
-  description = "Value of the Name tag for the EC2 instance"
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
+variable "region" {
+  description = "AWS region"
   type        = string
-  default     = "ExampleAppServerInstance"
+  default     = "us-east-2"
 }
