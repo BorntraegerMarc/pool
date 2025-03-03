@@ -13,3 +13,4 @@ export AWS_SECRET_ACCESS_KEY=
 # To Document
 
 - Validate correct AWS permissions
+- Remote State?
