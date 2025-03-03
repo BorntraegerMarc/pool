@@ -21,8 +21,16 @@ Init:
 - the AWS CLI v2.7.0/v1.24.0 or newer, installed and configured
 - AWS IAM Authenticator
 - kubectl v1.24.0 or newer
+- Have Docker running locally
 
-- Why deploy with Terraform?
+Build:
+cd microservice-1
+docker build -t microservice-1 .
+
+Run locally:
+docker run -it --rm --init -p 8000:8000 microservice-1
+
+## Why deploy with Terraform?
 
 While you could use kubectl or similar CLI-based tools to manage your Kubernetes resources, using Terraform has the following benefits:
 
