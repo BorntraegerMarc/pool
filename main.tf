@@ -50,13 +50,6 @@ module "eks" {
   tags = local.tags
 }
 
-# module "disabled_eks" {
-#   source  = "terraform-aws-modules/eks/aws"
-#   version = "~> 20.31"
-
-#   create = false
-# }
-
 ################################################################################
 # Supporting Resources
 ################################################################################
