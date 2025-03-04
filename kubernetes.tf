@@ -137,3 +137,74 @@ resource "kubernetes_service" "service-ms1" {
     }
   }
 }
+
+################################################################################
+# Microservice-2
+################################################################################
+resource "kubernetes_deployment" "deployment-ms2" {
+  metadata {
+    name      = "deployment-ms2"
+    namespace = "pool"
+  }
+
+  spec {
+    replicas = 2
+    selector {
+      match_labels = {
+        "app.kubernetes.io/name" = "app-ms2"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          "app.kubernetes.io/name" = "app-ms2"
+        }
+      }
+      spec {
+        container {
+          image             = "${aws_ecr_repository.pool-ms2.repository_url}:latest"
+          name              = "app-ms2"
+          image_pull_policy = "Always"
+
+          port {
+            container_port = 8000
+          }
+
+          resources {
+            requests = {
+              cpu = "0.5"
+            }
+          }
+        }
+
+        # Next two blocks used for ARM64 instances. Docs: https://docs.aws.amazon.com/eks/latest/userguide/set-builtin-node-pools.html
+        node_selector = {
+          "karpenter.sh/nodepool" = "system"
+        }
+        toleration {
+          key      = "CriticalAddonsOnly"
+          operator = "Exists"
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "service-ms2" {
+  metadata {
+    name      = "service-ms2"
+    namespace = "pool"
+  }
+
+  spec {
+    port {
+      port        = 80
+      target_port = 8000
+      protocol    = "TCP"
+    }
+    type = "NodePort"
+    selector = {
+      "app.kubernetes.io/name" = "app-ms2"
+    }
+  }
+}
