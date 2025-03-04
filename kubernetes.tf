@@ -43,7 +43,7 @@ resource "kubernetes_deployment" "deployment-2048" {
       }
       spec {
         container {
-          image             = "861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest"
+          image             = "${aws_ecr_repository.pool-ms1.repository_url}:latest"
           name              = "app-2048"
           image_pull_policy = "Always"
 

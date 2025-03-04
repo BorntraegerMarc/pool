@@ -41,9 +41,9 @@ resource "null_resource" "build_and_push" {
   # Bad practice to use Terraform Provisioners. But for simplicity we're combining build step with deployment. In prod we should hve separate CI/CD pipelines.
   provisioner "local-exec" {
     command = <<EOT
-      aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 861567669929.dkr.ecr.us-east-1.amazonaws.com
-      docker build -t 861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest --platform=linux/arm64 ./microservice-1
-      docker push 861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest
+      aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${aws_ecr_repository.pool-ms1.repository_url}
+      docker build -t ${aws_ecr_repository.pool-ms1.repository_url}:latest --platform=linux/arm64 ./microservice-1
+      docker push ${aws_ecr_repository.pool-ms1.repository_url}:latest
     EOT
   }
 }
