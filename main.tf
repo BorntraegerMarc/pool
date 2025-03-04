@@ -32,18 +32,34 @@ resource "aws_ecr_repository" "pool-ms1" {
   name = "pool/ms1"
 }
 
+resource "aws_ecr_repository" "pool-ms2" {
+  name = "pool/ms2"
+}
+
 ################################################################################
 # Docker Build and Push
+# Bad practice to use Terraform Provisioners. But for simplicity we're combining build step with deployment. In prod we should hve separate CI/CD pipelines.
 ################################################################################
-resource "null_resource" "build_and_push" {
+resource "null_resource" "build_and_push_ms1" {
   depends_on = [aws_ecr_repository.pool-ms1]
 
-  # Bad practice to use Terraform Provisioners. But for simplicity we're combining build step with deployment. In prod we should hve separate CI/CD pipelines.
   provisioner "local-exec" {
     command = <<EOT
       aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${aws_ecr_repository.pool-ms1.repository_url}
       docker build -t ${aws_ecr_repository.pool-ms1.repository_url}:latest --platform=linux/arm64 ./microservice-1
       docker push ${aws_ecr_repository.pool-ms1.repository_url}:latest
+    EOT
+  }
+}
+
+resource "null_resource" "build_and_push_ms2" {
+  depends_on = [aws_ecr_repository.pool-ms2]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${aws_ecr_repository.pool-ms2.repository_url}
+      docker build -t ${aws_ecr_repository.pool-ms2.repository_url}:latest --platform=linux/arm64 ./microservice-2
+      docker push ${aws_ecr_repository.pool-ms2.repository_url}:latest
     EOT
   }
 }
@@ -55,7 +71,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.31"
 
-  depends_on = [aws_ecr_repository.pool-ms1]
+  depends_on = [aws_ecr_repository.pool-ms1, aws_ecr_repository.pool-ms2]
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version

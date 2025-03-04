@@ -9,5 +9,5 @@ const server = createServer((req, res) => {
 const port = process.env.PORT || 8000;
 
 server.listen(port, () => {
-  console.log(`MS1 Listening on 127.0.0.1:${port}`);
+  console.log(`MS2 Listening on 127.0.0.1:${port}`);
 });
