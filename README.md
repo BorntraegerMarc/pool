@@ -22,6 +22,7 @@ Init:
 - AWS IAM Authenticator
 - kubectl v1.24.0 or newer
 - Have Docker running locally
+- Ensure you don't have other VPC with CIDR range 10.0.0.0/16 running
 
 Build:
 cd microservice-1
