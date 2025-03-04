@@ -57,6 +57,15 @@ resource "kubernetes_deployment" "deployment-2048" {
             }
           }
         }
+
+        # node_selector = {
+        #   "karpenter.sh/nodepool" = "system"
+        # }
+
+        # toleration {
+        #   key      = "CriticalAddonsOnly"
+        #   operator = "Exists"
+        # }
       }
     }
   }
