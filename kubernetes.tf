@@ -13,38 +13,38 @@ provider "kubernetes" {
   }
 }
 
-resource "kubernetes_namespace" "game-2048" {
+resource "kubernetes_namespace" "pool" {
   metadata {
-    name = "game-2048"
+    name = "pool"
     labels = {
-      name = "game-2048"
+      name = "pool"
     }
   }
 }
 
-resource "kubernetes_deployment" "deployment-2048" {
+resource "kubernetes_deployment" "deployment-ms1" {
   metadata {
-    name      = "deployment-2048"
-    namespace = "game-2048"
+    name      = "deployment-ms1"
+    namespace = "pool"
   }
 
   spec {
     replicas = 2
     selector {
       match_labels = {
-        "app.kubernetes.io/name" = "app-2048"
+        "app.kubernetes.io/name" = "app-ms1"
       }
     }
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = "app-2048"
+          "app.kubernetes.io/name" = "app-ms1"
         }
       }
       spec {
         container {
           image             = "${aws_ecr_repository.pool-ms1.repository_url}:latest"
-          name              = "app-2048"
+          name              = "app-ms1"
           image_pull_policy = "Always"
 
           port {
@@ -58,11 +58,10 @@ resource "kubernetes_deployment" "deployment-2048" {
           }
         }
 
-        # Used for ARM64 instances. Docs: https://docs.aws.amazon.com/eks/latest/userguide/set-builtin-node-pools.html
+        # Next two blocks used for ARM64 instances. Docs: https://docs.aws.amazon.com/eks/latest/userguide/set-builtin-node-pools.html
         node_selector = {
           "karpenter.sh/nodepool" = "system"
         }
-
         toleration {
           key      = "CriticalAddonsOnly"
           operator = "Exists"
@@ -72,10 +71,10 @@ resource "kubernetes_deployment" "deployment-2048" {
   }
 }
 
-resource "kubernetes_service" "service-2048" {
+resource "kubernetes_service" "service-ms1" {
   metadata {
-    name      = "service-2048"
-    namespace = "game-2048"
+    name      = "service-ms1"
+    namespace = "pool"
   }
 
   spec {
@@ -86,7 +85,7 @@ resource "kubernetes_service" "service-2048" {
     }
     type = "NodePort"
     selector = {
-      "app.kubernetes.io/name" = "app-2048"
+      "app.kubernetes.io/name" = "app-ms1"
     }
   }
 }
@@ -94,7 +93,7 @@ resource "kubernetes_service" "service-2048" {
 resource "kubernetes_ingress_class_v1" "alb" {
   metadata {
     name = "alb"
-    # namespace = "game-2048"
+    # namespace = "pool"
     labels = {
       "app.kubernetes.io/name" = "LoadBalancerController"
     }
@@ -105,10 +104,10 @@ resource "kubernetes_ingress_class_v1" "alb" {
   }
 }
 
-resource "kubernetes_ingress_v1" "ingress-2048" {
+resource "kubernetes_ingress_v1" "ingress-ms1" {
   metadata {
-    name      = "ingress-2048"
-    namespace = "game-2048"
+    name      = "ingress-ms1"
+    namespace = "pool"
     annotations = {
       "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
       "alb.ingress.kubernetes.io/target-type" = "ip"
@@ -124,7 +123,7 @@ resource "kubernetes_ingress_v1" "ingress-2048" {
           path_type = "Prefix"
           backend {
             service {
-              name = "service-2048"
+              name = "service-ms1"
               port {
                 number = 80
               }
