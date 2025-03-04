@@ -65,7 +65,7 @@ resource "null_resource" "build_and_push_ms2" {
 }
 
 ################################################################################
-# EKS Module
+# EKS
 ################################################################################
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -88,6 +88,43 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
 
   tags = local.tags
+}
+
+################################################################################
+# Aurora
+################################################################################
+resource "aws_rds_cluster" "pooldb" {
+  cluster_identifier          = "pooldb"
+  engine                      = "aurora-postgresql"
+  engine_mode                 = "provisioned"
+  engine_version              = "16.4"
+  database_name               = "pooldb"
+  master_username             = "pooluser"
+  manage_master_user_password = true
+  storage_encrypted           = true
+  skip_final_snapshot         = true
+  db_subnet_group_name        = aws_db_subnet_group.pooldb-subnet-group.name
+  vpc_security_group_ids      = [aws_security_group.pooldb-db.id]
+  enable_http_endpoint        = true # For easier debugging; Remove in prod
+  # db_cluster_parameter_group_name = aws_db_parameter_group.pooldb-parameter-group.name
+
+  serverlessv2_scaling_configuration {
+    min_capacity             = 0
+    max_capacity             = 10
+    seconds_until_auto_pause = 3600
+  }
+}
+
+resource "aws_rds_cluster_instance" "pooldbinstance" {
+  cluster_identifier = aws_rds_cluster.pooldb.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.pooldb.engine
+  engine_version     = aws_rds_cluster.pooldb.engine_version
+}
+
+resource "aws_db_subnet_group" "pooldb-subnet-group" {
+  name       = "pooldb-subnet-group"
+  subnet_ids = module.vpc.private_subnets
 }
 
 ################################################################################
@@ -118,3 +155,67 @@ module "vpc" {
 
   tags = local.tags
 }
+
+################################################################################
+# Supporting Resources - Security Group Aurora DB
+################################################################################
+
+resource "aws_security_group" "pooldb-db" {
+  name   = "pooldb-sg"
+  vpc_id = module.vpc.vpc_id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow-from-private-subnets" {
+  security_group_id = aws_security_group.pooldb-db.id
+  cidr_ipv4         = module.vpc.vpc_cidr_block
+  from_port         = 5432
+  to_port           = 5432
+  ip_protocol       = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow-all" {
+  security_group_id = aws_security_group.pooldb-db.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow-all-ipv6" {
+  security_group_id = aws_security_group.pooldb-db.id
+  cidr_ipv6         = "::/0"
+  ip_protocol       = "-1" # semantically equivalent to all ports
+}
+
+
+################################################################################
+# 
+################################################################################
+
+# resource "aws_db_parameter_group" "pooldb-parameter-group" {
+#   name   = "pooldb-parameter-group"
+#   family = "postgres16"
+
+#   parameter {
+#     name  = "log_connections"
+#     value = "1"
+#   }
+# }
+
+
+# resource "aws_security_group" "rds" {
+#   name   = "pooldb-sg"
+#   vpc_id = module.vpc.vpc_id
+
+#   ingress {
+#     from_port   = 5432
+#     to_port     = 5432
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   egress {
+#     from_port   = 5432
+#     to_port     = 5432
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
