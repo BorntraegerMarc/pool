@@ -22,6 +22,54 @@ resource "kubernetes_namespace" "pool" {
   }
 }
 
+resource "kubernetes_ingress_class_v1" "alb" {
+  metadata {
+    name = "alb"
+    # namespace = "pool"
+    labels = {
+      "app.kubernetes.io/name" = "LoadBalancerController"
+    }
+  }
+
+  spec {
+    controller = "eks.amazonaws.com/alb"
+  }
+}
+
+resource "kubernetes_ingress_v1" "ingress-ms1" {
+  metadata {
+    name      = "ingress-ms1"
+    namespace = "pool"
+    annotations = {
+      "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
+      "alb.ingress.kubernetes.io/target-type" = "ip"
+    }
+  }
+
+  spec {
+    ingress_class_name = "alb"
+    rule {
+      http {
+        path {
+          path      = "/"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = "service-ms1"
+              port {
+                number = 80
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+################################################################################
+# Microservice-1
+################################################################################
 resource "kubernetes_deployment" "deployment-ms1" {
   metadata {
     name      = "deployment-ms1"
@@ -86,51 +134,6 @@ resource "kubernetes_service" "service-ms1" {
     type = "NodePort"
     selector = {
       "app.kubernetes.io/name" = "app-ms1"
-    }
-  }
-}
-
-resource "kubernetes_ingress_class_v1" "alb" {
-  metadata {
-    name = "alb"
-    # namespace = "pool"
-    labels = {
-      "app.kubernetes.io/name" = "LoadBalancerController"
-    }
-  }
-
-  spec {
-    controller = "eks.amazonaws.com/alb"
-  }
-}
-
-resource "kubernetes_ingress_v1" "ingress-ms1" {
-  metadata {
-    name      = "ingress-ms1"
-    namespace = "pool"
-    annotations = {
-      "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
-      "alb.ingress.kubernetes.io/target-type" = "ip"
-    }
-  }
-
-  spec {
-    ingress_class_name = "alb"
-    rule {
-      http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = "service-ms1"
-              port {
-                number = 80
-              }
-            }
-          }
-        }
-      }
     }
   }
 }
