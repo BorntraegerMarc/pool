@@ -32,6 +32,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 20.31"
 
+  depends_on = [aws_ecr_repository.pool-ms1]
+
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
   cluster_endpoint_public_access = true
@@ -56,6 +58,20 @@ module "eks" {
 resource "aws_ecr_repository" "pool-ms1" {
   name = "pool/ms1"
 }
+
+resource "null_resource" "build_and_push" {
+  depends_on = [aws_ecr_repository.pool-ms1]
+
+  # Bad practice to use Terraform Provisioners. But for simplicity we're combining build step with deployment. In prod we should hve separate CI/CD pipelines.
+  provisioner "local-exec" {
+    command = <<EOT
+      aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 861567669929.dkr.ecr.us-east-1.amazonaws.com
+      docker build -t 861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest --platform=linux/arm64 ./microservice-1
+      docker push 861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest
+    EOT
+  }
+}
+
 
 ################################################################################
 # Supporting Resources
