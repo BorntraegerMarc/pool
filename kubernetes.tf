@@ -43,12 +43,12 @@ resource "kubernetes_deployment" "deployment-2048" {
       }
       spec {
         container {
-          image             = "public.ecr.aws/l6m2t8p7/docker-2048:latest"
+          image             = "861567669929.dkr.ecr.us-east-1.amazonaws.com/pool/ms1:latest"
           name              = "app-2048"
           image_pull_policy = "Always"
 
           port {
-            container_port = 80
+            container_port = 8000
           }
 
           resources {
@@ -58,14 +58,15 @@ resource "kubernetes_deployment" "deployment-2048" {
           }
         }
 
-        # node_selector = {
-        #   "karpenter.sh/nodepool" = "system"
-        # }
+        # Used for ARM64 instances. Docs: https://docs.aws.amazon.com/eks/latest/userguide/set-builtin-node-pools.html
+        node_selector = {
+          "karpenter.sh/nodepool" = "system"
+        }
 
-        # toleration {
-        #   key      = "CriticalAddonsOnly"
-        #   operator = "Exists"
-        # }
+        toleration {
+          key      = "CriticalAddonsOnly"
+          operator = "Exists"
+        }
       }
     }
   }
@@ -80,7 +81,7 @@ resource "kubernetes_service" "service-2048" {
   spec {
     port {
       port        = 80
-      target_port = 80
+      target_port = 8000
       protocol    = "TCP"
     }
     type = "NodePort"
