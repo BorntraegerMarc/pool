@@ -24,15 +24,22 @@ await dbclient.connect();
 
 console.log("DB Connected!!!");
 
-const res2 = await dbclient.query("select * from information_schema.tables;");
-
-console.log("DB Query nr. of rows: ", res2.rowCount);
+// Always initialize and seed the DB on container startup. This is for dev purposes only. In prod use a DB migration tool like Flyway.
+await dbclient.query(
+  "CREATE TABLE IF NOT EXISTS pool_data (id bigint GENERATED ALWAYS AS IDENTITY, data text NOT NULL);"
+);
+await dbclient.query(
+  `INSERT INTO pool_data (data) VALUES ('Default string in DB created at ${new Date().toISOString()}')`
+);
 
 console.log("Starting server...");
+
 const server = createServer(async (req, res) => {
   console.log("MS-2 Request received");
+  const row = await dbclient.query("SELECT * FROM pool_data LIMIT 1;");
+
   res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Hello World from MS-2!");
+  res.end(row.rows[0].data);
 });
 
 const port = process.env.PORT || 8000;
