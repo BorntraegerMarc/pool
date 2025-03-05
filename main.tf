@@ -29,11 +29,13 @@ locals {
 # ECR
 ################################################################################
 resource "aws_ecr_repository" "pool-ms1" {
-  name = "pool/ms1"
+  name         = "pool/ms1"
+  force_delete = true
 }
 
 resource "aws_ecr_repository" "pool-ms2" {
-  name = "pool/ms2"
+  name         = "pool/ms2"
+  force_delete = true
 }
 
 ################################################################################
