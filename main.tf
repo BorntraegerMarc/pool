@@ -220,38 +220,3 @@ resource "aws_vpc_security_group_egress_rule" "allow-all-ipv6" {
   cidr_ipv6         = "::/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
 }
-
-
-################################################################################
-# 
-################################################################################
-
-# resource "aws_db_parameter_group" "pooldb-parameter-group" {
-#   name   = "pooldb-parameter-group"
-#   family = "postgres16"
-
-#   parameter {
-#     name  = "log_connections"
-#     value = "1"
-#   }
-# }
-
-
-# resource "aws_security_group" "rds" {
-#   name   = "pooldb-sg"
-#   vpc_id = module.vpc.vpc_id
-
-#   ingress {
-#     from_port   = 5432
-#     to_port     = 5432
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   egress {
-#     from_port   = 5432
-#     to_port     = 5432
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
