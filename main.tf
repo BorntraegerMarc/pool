@@ -157,6 +157,42 @@ module "vpc" {
 }
 
 ################################################################################
+# Supporting Resources - Pod Identity
+################################################################################
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
+}
+
+resource "aws_iam_role" "pool" {
+  name               = "eks-pod-identity-pool"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "secrets" {
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite" # Amazon Managed policy - that's why we can hardcode the value because it should always exist
+  role       = aws_iam_role.pool.name
+}
+
+resource "aws_eks_pod_identity_association" "pool" {
+  cluster_name    = local.name
+  namespace       = "pool"
+  service_account = "pool-sa"
+  role_arn        = aws_iam_role.pool.arn
+}
+
+################################################################################
 # Supporting Resources - Security Group Aurora DB
 ################################################################################
 

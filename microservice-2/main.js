@@ -1,4 +1,16 @@
+import { GetSecretValueCommand, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { createServer } from "node:http";
+
+const client = new SecretsManagerClient({ region: process.env.AWS_REGION });
+const command = new GetSecretValueCommand({
+  SecretId: process.env.DB_SECRET_ARN,
+});
+const response = await client.send(command);
+
+console.log("DB Secrets: ", response.SecretString);
+const secret = JSON.parse(response.SecretString);
+console.log("DB username: ", secret.username);
+console.log("DB password: ", secret.password);
 
 const server = createServer(async (req, res) => {
   console.log("MS-2 Request received");
