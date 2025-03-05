@@ -19,7 +19,7 @@ const dbclient = new Client({
   user: dbSecrets.username,
   password: dbSecrets.password,
   database: "pooldb",
-  host: "pooldb.cluster-cak9debc6yeq.us-east-1.rds.amazonaws.com",
+  host: process.env.DB_HOST,
 });
 await dbclient.connect();
 

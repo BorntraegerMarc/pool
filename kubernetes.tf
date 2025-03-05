@@ -191,10 +191,13 @@ resource "kubernetes_deployment" "deployment-ms2" {
             name  = "DB_SECRET_ARN"
             value = aws_rds_cluster.pooldb.master_user_secret[0].secret_arn # For dev we're passing the secret ARN as env variable; In prod, use k8s secrets
           }
-
           env {
             name  = "AWS_REGION"
             value = local.region
+          }
+          env {
+            name  = "DB_HOST"
+            value = aws_rds_cluster.pooldb.endpoint
           }
         }
 
