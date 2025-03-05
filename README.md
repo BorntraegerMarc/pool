@@ -25,9 +25,15 @@ Init:
 - Ensure you don't have other VPC with CIDR range 10.0.0.0/16 running
 - Runs only on Linux/Mac - not Windows
 
-Build:
-cd microservice-1
-docker build -t microservice-1 .
+New Init:
+
+- Open Terminal / Console
+- Signin AWS CLI
+- git clone https://github.com/BorntraegerMarc/pool.git
+- cd ./pool
+- terraform init
+- terraform apply -auto-approve
+- See output: to view web app
 
 Run locally:
 docker run -it --rm --init -p 8000:8000 microservice-1
