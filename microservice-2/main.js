@@ -8,11 +8,12 @@ const secretsManagerCmd = new GetSecretValueCommand({
   SecretId: process.env.DB_SECRET_ARN,
 });
 
-console.log("Requesting Secrets Manager");
+console.log("Requesting Secrets Manager...");
+
 const secretsManagerRes = await secretsManagerClient.send(secretsManagerCmd);
 const dbSecrets = JSON.parse(secretsManagerRes.SecretString);
 
-console.log("Init DB Client");
+console.log("Init DB Client...");
 
 const dbclient = new Client({
   user: dbSecrets.username,
@@ -22,7 +23,7 @@ const dbclient = new Client({
 });
 await dbclient.connect();
 
-console.log("DB Connected!!!");
+console.log("DB Connected");
 
 // Always initialize and seed the DB on container startup. This is for dev purposes only. In prod use a DB migration tool like Flyway.
 await dbclient.query(
