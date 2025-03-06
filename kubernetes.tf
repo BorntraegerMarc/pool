@@ -153,6 +153,8 @@ resource "kubernetes_service" "service-ms1" {
 # Microservice-2
 ################################################################################
 resource "kubernetes_deployment" "deployment-ms2" {
+  depends_on = [aws_eks_pod_identity_association.pool]
+
   metadata {
     name      = "deployment-ms2"
     namespace = "pool"
@@ -210,7 +212,7 @@ resource "kubernetes_deployment" "deployment-ms2" {
           operator = "Exists"
         }
 
-        service_account_name            = "pool-sa"
+        service_account_name            = kubernetes_service_account.pool-sa.metadata[0].name
         automount_service_account_token = true
       }
     }
