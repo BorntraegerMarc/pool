@@ -38,6 +38,10 @@ New Init:
 If you want to interact with the EKS Node locally:
 aws eks update-kubeconfig --region us-east-1 --name ex-pool
 
+TODOs:
+
+- Check load balancing between microservices
+
 ## Why deploy with Terraform?
 
 While you could use kubectl or similar CLI-based tools to manage your Kubernetes resources, using Terraform has the following benefits:
