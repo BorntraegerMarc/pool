@@ -192,7 +192,7 @@ resource "aws_eks_pod_identity_association" "pool" {
 
   cluster_name    = local.name
   namespace       = "pool"
-  service_account = "pool-sa"
+  service_account = kubernetes_service_account.pool-sa.metadata[0].name
   role_arn        = aws_iam_role.pool.arn
 }
 
