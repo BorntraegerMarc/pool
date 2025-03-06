@@ -35,8 +35,8 @@ New Init:
 - terraform apply -auto-approve
 - See output: to view web app
 
-Run locally:
-docker run -it --rm --init -p 8000:8000 microservice-1
+If you want to interact with the EKS Node locally:
+aws eks update-kubeconfig --region us-east-1 --name ex-pool
 
 ## Why deploy with Terraform?
 
