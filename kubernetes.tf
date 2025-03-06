@@ -183,12 +183,6 @@ resource "kubernetes_deployment" "deployment-ms2" {
             container_port = 8000
           }
 
-          resources {
-            requests = {
-              cpu = "0.5"
-            }
-          }
-
           env {
             name  = "DB_SECRET_ARN"
             value = aws_rds_cluster.pooldb.master_user_secret[0].secret_arn # For dev we're passing the secret ARN as env variable; In prod, use k8s secrets
