@@ -74,7 +74,7 @@ resource "kubernetes_ingress_v1" "ingress-ms1" {
 resource "kubernetes_service_account" "pool-sa" {
   metadata {
     name      = "pool-sa"
-    namespace = "pool"
+    namespace = kubernetes_namespace.pool.metadata[0].name
   }
 }
 
@@ -153,7 +153,7 @@ resource "kubernetes_service" "service-ms1" {
 # Microservice-2
 ################################################################################
 resource "kubernetes_deployment" "deployment-ms2" {
-  depends_on = [aws_eks_pod_identity_association.pool]
+  depends_on = [aws_eks_pod_identity_association.pool, kubernetes_service_account.pool-sa]
 
   metadata {
     name      = "deployment-ms2"
