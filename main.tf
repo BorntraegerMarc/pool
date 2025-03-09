@@ -196,6 +196,14 @@ resource "aws_eks_pod_identity_association" "pool" {
   role_arn        = aws_iam_role.pool.arn
 }
 
+resource "null_resource" "delay_for_iam_propagation" {
+  depends_on = [aws_eks_pod_identity_association.pool]
+
+  provisioner "local-exec" {
+    command = "sleep 30" # Wait to allow IAM roles and policies to propagate. Else we receive an error inside the ms-2 container that no AWS credentials were found
+  }
+}
+
 ################################################################################
 # Supporting Resources - Security Group Aurora DB
 ################################################################################

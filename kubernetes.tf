@@ -82,6 +82,8 @@ resource "kubernetes_service_account" "pool-sa" {
 # Microservice-1
 ################################################################################
 resource "kubernetes_deployment" "deployment-ms1" {
+  depends_on = [kubernetes_deployment.deployment-ms2]
+
   metadata {
     name      = "deployment-ms1"
     namespace = "pool"
@@ -153,7 +155,7 @@ resource "kubernetes_service" "service-ms1" {
 # Microservice-2
 ################################################################################
 resource "kubernetes_deployment" "deployment-ms2" {
-  depends_on = [aws_eks_pod_identity_association.pool, kubernetes_service_account.pool-sa]
+  depends_on = [aws_eks_pod_identity_association.pool, kubernetes_service_account.pool-sa, null_resource.delay_for_iam_propagation]
 
   metadata {
     name      = "deployment-ms2"
