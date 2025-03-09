@@ -41,6 +41,7 @@ aws eks update-kubeconfig --region us-east-1 --name ex-pool
 TODOs:
 
 - Check load balancing between microservices
+- Check race condition from git commit 7504d1395016408ed195340c2a218df35d820159
 
 ## Why deploy with Terraform?
 
