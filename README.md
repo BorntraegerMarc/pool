@@ -1,47 +1,66 @@
-# pool
+# Pool Demo App Getting Started
 
-# Setup
+# Setup Prerequisites
 
+- This demo uses AWS resources to automatically deploy the demo app into a target AWS account. You need to an AWS account to use.
+- Validate that you have sufficient AWS permissions in the target account.
+- [Install Terraform v1.3+](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
+- [Install AWS CLI v2.7.0/v1.24.0 or newer](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [Install Docker](https://docs.docker.com/engine/install/)
+- Tested only on Mac/Linux - not Windows
+
+# Installation
+
+Start a console and [Setup the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
+
+Ensure you don't have other VPC with CIDR range 10.0.0.0/16 in your target AWS account in the `us-east-1` region
+
+```bash
+git clone https://github.com/BorntraegerMarc/pool.git
+cd ./pool
 ```
-export AWS_ACCESS_KEY_ID=
+
+Verify Docker is running:
+
+```bash
+docker ps
 ```
 
+Init Terraform:
+
+```bash
+terraform init
 ```
-export AWS_SECRET_ACCESS_KEY=
+
+Apply Terraform scripts & start deployment:
+
+```bash
+terraform apply
 ```
 
-# To Document
+The output should look something like this:
 
-Init:
+```bash
+[...]
+Apply complete! Resources: 90 added, 0 changed, 0 destroyed.
 
-- Validate correct AWS permissions
-- Remote State?
-- Terraform v1.3+ installed locally.
-- an AWS account
-- the AWS CLI v2.7.0/v1.24.0 or newer, installed and configured
-- AWS IAM Authenticator
-- kubectl v1.24.0 or newer
-- Have Docker running locally
-- Ensure you don't have other VPC with CIDR range 10.0.0.0/16 running
-- Runs only on Linux/Mac - not Windows
+Outputs:
 
-New Init:
+eks_cluster_endpoint = "..."
+web_api_hostname = "The Load Balancer takes more time to provision. Please check your endpoint for the Web API once the load balancer becomes available under ..."
+```
 
-- Open Terminal / Console
-- Signin AWS CLI
-- git clone https://github.com/BorntraegerMarc/pool.git
-- cd ./pool
-- terraform init
-- terraform apply -auto-approve
-- See output: to view web app
+If you want to query/interact with the EKS Node locally:
 
-If you want to interact with the EKS Node locally:
+```bash
 aws eks update-kubeconfig --region us-east-1 --name ex-pool
+
+kubectl get pods --all-namespaces
+```
 
 TODOs:
 
 - Check load balancing between microservices
-- Check race condition from git commit 7504d1395016408ed195340c2a218df35d820159
 
 ## Why deploy with Terraform?
 
