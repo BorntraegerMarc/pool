@@ -13,8 +13,6 @@
 
 Start a console and [Setup the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
 
-Ensure you don't have other VPC with CIDR range 10.0.0.0/16 in your target AWS account in the `us-east-1` region
-
 ```bash
 git clone https://github.com/BorntraegerMarc/pool.git
 cd ./pool
@@ -24,6 +22,12 @@ Verify Docker is running:
 
 ```bash
 docker ps
+```
+
+The demo app deploys the following VPC CIDR range: 10.0.0.0/16 Ensure you don't have a VPC with with this CIDR range in your target AWS account in the `us-east-1` region:
+
+```bash
+aws ec2 describe-vpcs --region us-east-1
 ```
 
 Init Terraform:
@@ -58,16 +62,4 @@ aws eks update-kubeconfig --region us-east-1 --name ex-pool
 kubectl get pods --all-namespaces
 ```
 
-TODOs:
-
-- Check load balancing between microservices
-
-## Why deploy with Terraform?
-
-While you could use kubectl or similar CLI-based tools to manage your Kubernetes resources, using Terraform has the following benefits:
-
-Unified Workflow - If you are already provisioning Kubernetes clusters with Terraform, use the same configuration language to deploy your applications into your cluster.
-
-Full Lifecycle Management - Terraform doesn't only create resources, it updates, and deletes tracked resources without requiring you to inspect the API to identify those resources.
-
-Graph of Relationships - Terraform understands dependency relationships between resources. For example, if a Persistent Volume Claim claims space from a particular Persistent Volume, Terraform won't attempt to create the claim if it fails to create the volume.
+Finished 🎉
