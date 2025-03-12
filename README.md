@@ -1,4 +1,4 @@
-# Pool Demo App Getting Started
+# Pool Demo App - Getting Started
 
 # Setup Prerequisites
 
