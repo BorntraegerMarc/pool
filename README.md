@@ -11,7 +11,7 @@
 
 # Installation
 
-Start a console and [Setup the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
+Start a terminal and [Setup the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html)
 
 ```bash
 git clone https://github.com/BorntraegerMarc/pool.git
